@@ -1,0 +1,16 @@
+# Leitura e extração de PDF
+pymupdf==1.24.10        # leitura de PDF (fitz)
+
+# Processamento de texto
+nltk==3.9.1
+
+# Hugging Face e LLM
+transformers==4.46.3
+accelerate==1.1.1
+
+# Torch: deixe sem versão fixa para pegar a melhor para seu sistema
+torch
+
+# Utilidades
+tqdm==4.66.5
+python-dotenv==1.0.1
