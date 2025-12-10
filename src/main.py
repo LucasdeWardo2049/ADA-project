@@ -11,15 +11,22 @@ from .utils.files import format_bytes
 
 
 def setup_logging(verbose: bool = False, quiet: bool = False) -> None:
+    """
+    Configura o sistema de logging da aplicação.
+    
+    Args:
+        verbose: Se True, exibe logs DEBUG
+        quiet: Se True, exibe apenas logs ERROR
+    """
     if quiet:
-        level = logging.ERROR
+        log_level = logging.ERROR
     elif verbose:
-        level = logging.DEBUG
+        log_level = logging.DEBUG
     else:
-        level = logging.INFO
+        log_level = logging.INFO
     
     logging.basicConfig(
-        level=level,
+        level=log_level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )

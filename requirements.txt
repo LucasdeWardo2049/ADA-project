@@ -1,5 +1,5 @@
 # Leitura e extração de PDF
-pymupdf==1.24.10        # leitura de PDF (fitz)
+pymupdf==1.24.10       
 
 # Processamento de texto
 nltk==3.9.1
