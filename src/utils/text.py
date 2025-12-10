@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from collections import Counter
 from typing import List, Tuple, Set
 import nltk
@@ -14,14 +15,55 @@ def get_portuguese_stopwords() -> Set[str]:
     return set(stopwords.words('portuguese'))
 
 
-def clean_text(text: str) -> str:
-    text = re.sub(r'[^\w\s]', ' ', text)
+def normalize_unicode(text: str) -> str:
+    """Normaliza caracteres Unicode para forma NFKD."""
+    return unicodedata.normalize('NFKD', text)
+
+
+def remove_line_breaks_hyphens(text: str) -> str:
+    """Remove hífens de quebra de linha (ex: 'desenvolvi-\nmento' -> 'desenvolvimento')."""
+    return re.sub(r'(\w+)-\s*\n\s*(\w+)', r'\1\2', text)
+
+
+def clean_text(text: str, advanced: bool = True) -> str:
+    """Limpa e normaliza texto com opções avançadas.
+    
+    Args:
+        text: Texto a ser limpo
+        advanced: Se True, aplica normalizações avançadas
+    
+    Returns:
+        Texto limpo e normalizado
+    """
+    if advanced:
+        text = normalize_unicode(text)
+        text = remove_line_breaks_hyphens(text)
+    
     text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r'[^\w\s.,;:!?\-]', ' ', text)
+    text = re.sub(r'\d+', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    
     return text.strip()
 
 
-def tokenize(text: str) -> List[str]:
-    cleaned = clean_text(text)
+def remove_accents(text: str) -> str:
+    """Remove acentos do texto mantendo caracteres base."""
+    nfkd_form = unicodedata.normalize('NFD', text)
+    return ''.join([char for char in nfkd_form if not unicodedata.combining(char)])
+
+
+def tokenize(text: str, advanced_clean: bool = True) -> List[str]:
+    """Tokeniza texto em palavras individuais.
+    
+    Args:
+        text: Texto a ser tokenizado
+        advanced_clean: Se True, usa limpeza avançada
+    
+    Returns:
+        Lista de tokens em minúsculas
+    """
+    cleaned = clean_text(text, advanced=advanced_clean)
     return [word.lower() for word in cleaned.split() if word]
 
 

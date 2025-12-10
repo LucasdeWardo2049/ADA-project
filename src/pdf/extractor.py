@@ -1,7 +1,8 @@
 import logging
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 import fitz
+import re
 
 from ..utils.text import count_words, get_vocabulary_size, get_most_common_words
 from ..utils.files import get_file_size
@@ -12,22 +13,113 @@ logger = logging.getLogger(__name__)
 class PDFExtractor:
     
     def __init__(self, pdf_path: str):
+        """Inicializa o extrator de PDF com tratamento robusto de erros."""
         self.pdf_path = Path(pdf_path)
         if not self.pdf_path.exists():
             raise FileNotFoundError(f"Arquivo não encontrado: {pdf_path}")
         
-        self.doc = fitz.open(pdf_path)
-        logger.info(f"PDF carregado: {pdf_path}")
+        try:
+            self.doc = fitz.open(pdf_path)
+            logger.info(f"PDF carregado: {pdf_path} ({len(self.doc)} páginas)")
+        except fitz.FileDataError as error:
+            logger.error(f"PDF corrompido ou inválido: {error}")
+            raise ValueError(f"Não foi possível abrir o PDF: arquivo corrompido ou inválido") from error
+        except Exception as error:
+            logger.error(f"Erro ao abrir PDF: {error}")
+            raise
     
     def extract_text(self) -> str:
+        """Extrai todo o texto do PDF com tratamento de erros por página."""
         text_parts = []
-        for page_num in range(len(self.doc)):
-            page = self.doc[page_num]
-            text_parts.append(page.get_text())
+        total_pages = len(self.doc)
+        
+        for page_num in range(total_pages):
+            try:
+                page = self.doc[page_num]
+                text = page.get_text()
+                text_parts.append(text)
+                
+                if (page_num + 1) % 50 == 0:
+                    logger.debug(f"Processadas {page_num + 1}/{total_pages} páginas")
+                    
+            except MemoryError:
+                logger.error(f"Memória insuficiente ao processar página {page_num + 1}")
+                raise MemoryError(f"Memória insuficiente para processar PDF grande. Tente dividir o arquivo.") from None
+            except Exception as error:
+                logger.warning(f"Erro ao extrair texto da página {page_num + 1}: {error}")
+                text_parts.append(f"[Erro na página {page_num + 1}]")
         
         full_text = '\n'.join(text_parts)
-        logger.info(f"Texto extraído: {len(full_text)} caracteres")
+        logger.info(f"Texto extraído: {len(full_text)} caracteres de {total_pages} páginas")
         return full_text
+    
+    def detect_titles(self) -> List[str]:
+        """Detecta possíveis títulos baseado no tamanho da fonte e formatação."""
+        titles = []
+        
+        try:
+            for page_num in range(len(self.doc)):
+                page = self.doc[page_num]
+                blocks = page.get_text("dict")["blocks"]
+                
+                for block in blocks:
+                    if "lines" not in block:
+                        continue
+                    
+                    for line in block["lines"]:
+                        for span in line["spans"]:
+                            text = span["text"].strip()
+                            font_size = span["size"]
+                            font_flags = span["flags"]
+                            
+                            is_bold = font_flags & 2**4
+                            is_large = font_size > 12
+                            is_short = len(text.split()) <= 15
+                            
+                            if text and (is_bold or is_large) and is_short:
+                                titles.append(text)
+            
+            logger.info(f"Detectados {len(titles)} possíveis títulos")
+        except Exception as error:
+            logger.warning(f"Erro ao detectar títulos: {error}")
+        
+        return titles
+    
+    def detect_sections(self) -> List[Dict[str, Any]]:
+        """Detecta seções baseado em padrões numéricos e de texto."""
+        sections = []
+        section_pattern = re.compile(r'^(\d+\.?\s+|[IVX]+\.?\s+|[A-Z]\.?\s+)(.+)$', re.MULTILINE)
+        
+        try:
+            text = self.extract_text()
+            matches = section_pattern.finditer(text)
+            
+            for match in matches:
+                section_number = match.group(1).strip()
+                section_title = match.group(2).strip()
+                
+                if len(section_title) > 5 and len(section_title) < 200:
+                    sections.append({
+                        'number': section_number,
+                        'title': section_title
+                    })
+            
+            logger.info(f"Detectadas {len(sections)} seções")
+        except Exception as error:
+            logger.warning(f"Erro ao detectar seções: {error}")
+        
+        return sections
+    
+    def extract_keywords(self, n: int = 15) -> List[Tuple[str, int]]:
+        """Extrai palavras-chave mais relevantes do documento."""
+        try:
+            text = self.extract_text()
+            keywords = get_most_common_words(text, n=n, remove_stopwords=True)
+            logger.info(f"Extraídas {len(keywords)} palavras-chave")
+            return keywords
+        except Exception as error:
+            logger.warning(f"Erro ao extrair palavras-chave: {error}")
+            return []
     
     def get_page_count(self) -> int:
         return len(self.doc)
@@ -36,28 +128,47 @@ class PDFExtractor:
         return get_file_size(str(self.pdf_path))
     
     def analyze(self) -> Dict[str, Any]:
+        """Realiza análise completa do PDF incluindo estrutura e metadados."""
         logger.info("Iniciando análise do PDF...")
         
-        text = self.extract_text()
-        page_count = self.get_page_count()
-        file_size = self.get_file_size()
-        word_count = count_words(text)
-        vocabulary_size = get_vocabulary_size(text)
-        most_common = get_most_common_words(text, n=10)
-        
-        analysis = {
-            'file_path': str(self.pdf_path),
-            'file_name': self.pdf_path.name,
-            'page_count': page_count,
-            'file_size_bytes': file_size,
-            'word_count': word_count,
-            'vocabulary_size': vocabulary_size,
-            'most_common_words': most_common,
-            'full_text': text
-        }
-        
-        logger.info("Análise completa")
-        return analysis
+        try:
+            text = self.extract_text()
+            page_count = self.get_page_count()
+            file_size = self.get_file_size()
+            
+            logger.debug("Analisando métricas de texto...")
+            word_count = count_words(text)
+            vocabulary_size = get_vocabulary_size(text)
+            most_common = get_most_common_words(text, n=10)
+            
+            logger.debug("Detectando estrutura do documento...")
+            titles = self.detect_titles()
+            sections = self.detect_sections()
+            keywords = self.extract_keywords(n=15)
+            
+            analysis = {
+                'file_path': str(self.pdf_path),
+                'file_name': self.pdf_path.name,
+                'page_count': page_count,
+                'file_size_bytes': file_size,
+                'word_count': word_count,
+                'vocabulary_size': vocabulary_size,
+                'most_common_words': most_common,
+                'titles': titles[:10],
+                'sections': sections[:20],
+                'keywords': keywords,
+                'full_text': text
+            }
+            
+            logger.info("Análise completa com sucesso")
+            return analysis
+            
+        except MemoryError:
+            logger.error("Memória insuficiente para analisar PDF")
+            raise
+        except Exception as error:
+            logger.error(f"Erro durante análise: {error}")
+            raise RuntimeError(f"Falha ao analisar PDF: {error}") from error
     
     def close(self):
         if self.doc:
