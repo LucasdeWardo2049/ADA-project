@@ -117,6 +117,15 @@ Exemplos de uso:
         help='Gera resumos reproduzíveis (desabilita amostragem aleatória)'
     )
     
+    # Configuração de logs
+    parser.set_defaults(log=True)
+    parser.add_argument(
+        '--no-log-file',
+        dest='log',
+        action='store_false',
+        help='Desabilita o registro de logs em arquivo (mantém apenas console)'
+    )
+    
     return parser
 
 
