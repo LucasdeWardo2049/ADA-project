@@ -1,4 +1,4 @@
-# 📊 Analisador de PDF com LLM
+# Analisador de PDF com LLM
 
 > **Desafio de Processo Seletivo - ADA Tech**  
 > Ferramenta CLI em Python para análise completa de documentos PDF e geração de resumos usando modelos de linguagem locais (Hugging Face).
@@ -6,15 +6,15 @@
 **Desenvolvido por:** Lucas de Wardo  
 **Repositório:** [github.com/LucasdeWardo2049/ADA-project](https://github.com/LucasdeWardo2049/ADA-project)
 
-## 🚀 Funcionalidades
+##  Funcionalidades
 
-### Obrigatórias ✅
+### Obrigatórias 
 - Extração de metadados do PDF (páginas, palavras, tamanho)
 - Análise estatística do texto (vocabulário, palavras mais comuns)
 - Extração de imagens
 - Geração de resumo com LLM local (Hugging Face)
 
-### Extras ⭐
+### Extras 
 - Sistema de logs completo
 - Relatório em Markdown
 - Tipagem com `typing`
@@ -23,7 +23,7 @@
 - Tratamento robusto de exceções
 - Context managers para recursos
 
-## 📋 Requisitos
+## Requisitos
 
 - **Python 3.9+** (recomendado: **Python 3.11**)
   - ⚠️ Python 3.14+ ainda não é suportado por algumas dependências (PyMuPDF)
@@ -50,7 +50,7 @@ pip install -r requirements.txt
 
 **Nota:** Se você tiver múltiplas versões de Python instaladas, use `py -3.11 -m venv .venv` para garantir a versão correta.
 
-## 💻 Uso
+## Uso
 
 ### Uso Básico
 
@@ -145,7 +145,7 @@ ADA/
 - **Logging**: Sistema estruturado com 3 níveis (ERROR, INFO, DEBUG)
 - **Código limpo**: Funções pequenas e focadas, sem arquivos gigantes
 
-## 🔍 Exemplo de Saída
+##  Exemplo de Saída
 
 ```
 ======================================================================
@@ -199,7 +199,7 @@ Este documento aborda os principais conceitos de desenvolvimento...
 ======================================================================
 ```
 
-## 🧪 Modelos LLM Suportados
+##  Modelos LLM Suportados
 
 Por padrão, usa `unicamp-dl/ptt5-base-portuguese-vocab` (otimizado para português).
 
@@ -208,7 +208,7 @@ Outros modelos compatíveis:
 - `google/flan-t5-base`
 - `t5-small`
 
-## 🧪 Testes
+##  Testes
 
 Execute os testes unitários:
 
@@ -230,7 +230,7 @@ python -m unittest discover tests -v
 - `test_files.py`: 10 testes para manipulação de arquivos
 - `test_extractor.py`: 6 testes para extração de PDF
 
-## 📝 Notas Técnicas
+##  Notas Técnicas
 
 - **Tipagem completa**: Type hints em todas as funções e métodos
 - **Stopwords**: Lista em português do NLTK
@@ -241,7 +241,7 @@ python -m unittest discover tests -v
 - **Estrutura avançada**: Detecção de títulos, seções e palavras-chave
 - **Relatório unificado**: Markdown completo com todas as análises
 
-## 🐛 Solução de Problemas
+##  Solução de Problemas
 
 ### Python 3.14+ não funciona
 **Problema:** `pymupdf` ainda não suporta Python 3.14+  
@@ -272,7 +272,7 @@ python -m src.main documento.pdf --model google/flan-t5-small
 
 ---
 
-## 📖 Como Rodar o Projeto
+## Como Rodar o Projeto
 
 ### Pré-requisitos
 - **Python 3.11** (recomendado) ou Python 3.9+
@@ -339,7 +339,7 @@ Após a execução, o programa cria automaticamente:
 
 ---
 
-## 🎯 Funcionalidades Implementadas
+##  Funcionalidades Implementadas
 
 ### ✅ Funcionalidades Obrigatórias
 
@@ -370,9 +370,8 @@ Após a execução, o programa cria automaticamente:
 - ✅ Mensagens de erro claras e específicas
 - ✅ Help completo com exemplos de uso
 
-### ⭐ Funcionalidades Extras (Diferenciais)
 
-### Funcionalidades Extras (Diferenciais) 🌟
+### Funcionalidades Extras (Diferenciais) 
 
 #### 1. Detecção de Estrutura do PDF
 - Identificação automática de títulos (por tamanho de fonte e negrito)
@@ -433,9 +432,9 @@ Após a execução, o programa cria automaticamente:
 
 ---
 
-## ⭐ O que Gostaria que Fosse Avaliado
+##  O que eu gostaria que fosse avaliado:
 
-### 1. Arquitetura e Organização do Código 🏗️
+### 1. Arquitetura e Organização do Código 
 
 #### Estrutura Modular
 - **4 módulos principais** com responsabilidades únicas:
@@ -456,7 +455,7 @@ Após a execução, o programa cria automaticamente:
 - `.gitignore` atualizado para nova estrutura
 - Geração automática de diretórios quando necessário
 
-### 2. Qualidade e Manutenibilidade do Código 📝
+### 2. Qualidade e Manutenibilidade do Código 
 
 #### Tipagem Completa
 - **Type hints em 100% das funções e métodos**
@@ -482,7 +481,7 @@ Após a execução, o programa cria automaticamente:
 - Fallback inteligente (modelo alternativo se principal falhar)
 - Graceful degradation (continua análise mesmo com erro em página)
 
-### 3. Funcionalidades Avançadas e Diferenciais 🌟
+### 3. Funcionalidades Avançadas e Diferenciais 
 
 #### Detecção de Estrutura do PDF
 - Identificação automática de títulos (tamanho de fonte + negrito)
@@ -518,7 +517,7 @@ Após a execução, o programa cria automaticamente:
 - Formatação com emojis e tabelas
 - **Valor**: Documento único pronto para compartilhar
 
-### 4. Experiência do Desenvolvedor (DX) 👨‍💻
+### 4. Experiência do Desenvolvedor (DX) 
 
 - **Instalação simples**: `pip install -r requirements.txt`
 - **Uso intuitivo**: Comandos claros e help detalhado
@@ -526,7 +525,7 @@ Após a execução, o programa cria automaticamente:
 - **Validação proativa**: Erros detectados cedo com mensagens claras
 - **Extensibilidade**: Fácil adicionar novos analisadores ou modelos
 
-### 5. Critérios Específicos do Desafio ADA ✨
+### 5. Critérios Específicos do Desafio ADA 
 
 | Critério | Implementação | Destaque |
 |----------|---------------|----------|
@@ -539,7 +538,7 @@ Após a execução, o programa cria automaticamente:
 
 ---
 
-## 🚀 Diferenciais Técnicos
+##  Diferenciais Técnicos
 
 1. **Codigo intuitivo** - Código autoexplicativo 
 2. **Commits organizados** - Seguindo Conventional Commits
@@ -549,7 +548,7 @@ Após a execução, o programa cria automaticamente:
 
 ---
 
-## 📚 Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 - **Python 3.11** - Linguagem principal
 - **PyMuPDF (fitz)** - Extração de PDF
@@ -558,15 +557,7 @@ Após a execução, o programa cria automaticamente:
 - **NLTK** - Processamento de linguagem natural
 - **unittest** - Framework de testes
 
----
-
-## 📄 Licença
-
-Este projeto foi desenvolvido como parte do processo seletivo da **ADA Tech** e é disponibilizado para fins educacionais e de avaliação.
-
----
-
-## 👨‍💻 Autor
+##  Autor
 
 **Lucas de Wardo**
 - GitHub: [@LucasdeWardo2049](https://github.com/LucasdeWardo2049)
@@ -574,7 +565,7 @@ Este projeto foi desenvolvido como parte do processo seletivo da **ADA Tech** e 
 
 ---
 
-## 🎯 Sobre o Desafio
+##  Sobre o Desafio
 
 Este projeto foi desenvolvido como resposta ao desafio técnico do processo seletivo da **ADA Tech**, que solicitava:
 
@@ -593,8 +584,6 @@ Este projeto foi desenvolvido como resposta ao desafio técnico do processo sele
 - Tipagem completa com type hints
 - Normalização avançada de texto
 
----
 
-**⭐ Se este projeto atendeu suas expectativas, considere dar uma estrela no repositório!**
 
 
