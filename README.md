@@ -584,8 +584,6 @@ Este projeto foi desenvolvido como resposta ao desafio técnico do processo sele
 - Tipagem completa com type hints
 - Normalização avançada de texto
 
----
 
-**⭐ Se este projeto atendeu suas expectativas, considere dar uma estrela no repositório!**
 
 
