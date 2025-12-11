@@ -36,5 +36,5 @@ class Summarizer:
         logger.info("Resumo gerado com sucesso")
         return final_summary
     
-    def cleanup(self):
+    def cleanup(self) -> None:
         self.model.unload()

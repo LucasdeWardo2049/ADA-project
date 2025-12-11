@@ -33,15 +33,16 @@ env/
 *.swo
 *~
 
-# Imagens extraídas
-imagens/
+# Outputs gerados pela aplicação
+outputs/
+!outputs/.gitkeep
 
-# Relatórios gerados
-relatorio*.md
-*.txt
+# Imagens extraídas (legacy)
+imagens/
 
 # Logs
 *.log
+logs/
 
 # OS
 .DS_Store

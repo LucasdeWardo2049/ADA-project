@@ -26,7 +26,7 @@ Exemplos de uso:
         '-o', '--output-dir',
         type=str,
         default=None,
-        help='Diretório para salvar as imagens extraídas (padrão: imagens/<nome-pdf>/)'
+        help='Diretório para salvar as imagens extraídas (padrão: outputs/images/<nome-pdf>/)'
     )
     
     parser.add_argument(
@@ -52,7 +52,7 @@ Exemplos de uso:
         '-r', '--report',
         type=str,
         default=None,
-        help='Gera relatório em Markdown no caminho especificado'
+        help='Gera relatório completo em Markdown (padrão: outputs/relatorio_<nome-pdf>.md se não especificado)'
     )
     
     parser.add_argument(

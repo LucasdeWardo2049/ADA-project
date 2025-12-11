@@ -16,7 +16,7 @@ class LLMModel:
         self.tokenizer: Optional[AutoTokenizer] = None
         self.model: Optional[AutoModelForSeq2SeqLM] = None
     
-    def load(self):
+    def load(self) -> None:
         logger.info(f"Carregando modelo: {self.model_name}")
         
         try:
@@ -62,7 +62,7 @@ class LLMModel:
         
         return generated_text
     
-    def unload(self):
+    def unload(self) -> None:
         if self.model:
             del self.model
             self.model = None

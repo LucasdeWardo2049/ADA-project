@@ -170,13 +170,13 @@ class PDFExtractor:
             logger.error(f"Erro durante análise: {error}")
             raise RuntimeError(f"Falha ao analisar PDF: {error}") from error
     
-    def close(self):
+    def close(self) -> None:
         if self.doc:
             self.doc.close()
             logger.info("PDF fechado")
     
-    def __enter__(self):
+    def __enter__(self) -> 'PDFExtractor':
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         self.close()

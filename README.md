@@ -91,7 +91,7 @@ O projeto segue uma arquitetura modular com **separação clara de responsabilid
 
 ```
 ADA/
-├── src/
+├── src/                     # Código fonte
 │   ├── __init__.py          # Versão do pacote
 │   ├── main.py              # Ponto de entrada da aplicação
 │   │
@@ -114,9 +114,22 @@ ADA/
 │       ├── text.py          # Processamento de texto (tokenização, stopwords)
 │       └── files.py         # Manipulação de arquivos e diretórios
 │
-├── imagens/                 # Imagens extraídas (gerado automaticamente)
+├── tests/                   # Testes unitários
+│   ├── __init__.py
+│   ├── test_text.py         # Testes para utils/text.py
+│   ├── test_files.py        # Testes para utils/files.py
+│   └── test_extractor.py    # Testes para pdf/extractor.py
+│
+├── outputs/                 # Outputs organizados (criado automaticamente)
+│   ├── images/              # Imagens extraídas dos PDFs
+│   └── relatorio_*.md       # Relatórios completos em Markdown
+│
+├── logs/                    # Logs da aplicação (criado automaticamente)
+│   └── pdf_analyzer.log     # Arquivo de log com rotação
+│
 ├── .venv/                   # Ambiente virtual Python
 ├── requirements.txt         # Dependências do projeto
+├── .gitignore              # Arquivos ignorados pelo Git
 └── README.md               # Documentação
 ```
 
@@ -149,18 +162,33 @@ Caminho: /caminho/para/documento.pdf
     3. software          (32 ocorrências)
     ...
 
+📑 Títulos detectados (5):
+   - Introdução
+   - Metodologia Aplicada
+   ...
+
+📋 Seções detectadas (8):
+   1. Introdução
+   2.1 Desenvolvimento
+   ...
+
+🔑 Palavras-chave principais:
+   tecnologia, inteligência, artificial, sistema, dados, modelo...
+
 ======================================================================
 EXTRAÇÃO DE IMAGENS
 ======================================================================
 
 🖼️  Total de imagens extraídas: 8
-📁 Diretório de saída: imagens/documento
+📁 Diretório de saída: outputs/images/documento
 
 ======================================================================
 RESUMO DO DOCUMENTO (gerado por LLM)
 ======================================================================
 
 Este documento aborda os principais conceitos de desenvolvimento...
+
+📋 Relatório completo salvo em: outputs/relatorio_documento.md
 
 ======================================================================
 ✅ Processamento concluído com sucesso!
@@ -176,13 +204,38 @@ Outros modelos compatíveis:
 - `google/flan-t5-base`
 - `t5-small`
 
+## 🧪 Testes
+
+Execute os testes unitários:
+
+```powershell
+# Rodar todos os testes
+python -m unittest discover tests
+
+# Rodar testes específicos
+python -m unittest tests.test_text
+python -m unittest tests.test_files
+python -m unittest tests.test_extractor
+
+# Rodar com verbose
+python -m unittest discover tests -v
+```
+
+**Cobertura de testes:**
+- `test_text.py`: 12 testes para funções de processamento de texto
+- `test_files.py`: 10 testes para manipulação de arquivos
+- `test_extractor.py`: 6 testes para extração de PDF
+
 ## 📝 Notas Técnicas
 
-- **Stopwords**: Usa lista em português do NLTK
-- **Chunking**: Textos longos são divididos automaticamente
-- **Device**: Usa GPU (CUDA) se disponível, senão CPU
+- **Tipagem completa**: Type hints em todas as funções e métodos
+- **Stopwords**: Lista em português do NLTK
+- **Chunking**: Textos longos divididos automaticamente
+- **Device**: GPU (CUDA) se disponível, senão CPU
 - **Context Managers**: Fechamento automático de recursos
-- **Logging**: Sistema completo de logs em 3 níveis
+- **Logging**: Sistema completo em arquivo + console com rotação
+- **Estrutura avançada**: Detecção de títulos, seções e palavras-chave
+- **Relatório unificado**: Markdown completo com todas as análises
 
 ## 🐛 Solução de Problemas
 
@@ -228,12 +281,62 @@ python -m src.main documento.pdf --model google/flan-t5-small
 - **Resumo com LLM local**: Integração Hugging Face, execução 100% local
 
 ### Funcionalidades Extras (Diferenciais) 🌟
-- **Cuidado com UX em linha de comando**: 
-  - Mensagens claras e formatadas
-  - Emojis para melhor legibilidade
-  - Progress feedback durante operações longas
-  - Validação de argumentos com mensagens específicas
-  - Help detalhado com exemplos práticos
+
+#### 1. Detecção de Estrutura do PDF
+- Identificação automática de títulos (por tamanho de fonte e negrito)
+- Detecção de seções numeradas (1., I., A., etc.)
+- Extração de palavras-chave principais
+
+#### 2. Tratamento Robusto para PDFs Grandes
+- Processamento página por página com logging de progresso
+- Tratamento de `MemoryError` e PDFs corrompidos
+- Fallback para páginas com erro sem interromper análise
+- Controle de I/O para extração de imagens
+
+#### 3. Normalização Avançada de Texto
+- Remoção de hífens de quebra de linha
+- Normalização Unicode (NFKD)
+- Função para remover acentos
+- Limpeza avançada com preservação de contexto
+
+#### 4. Sistema de Logs em Arquivo
+- Logs salvos em `logs/pdf_analyzer.log`
+- Rotação automática (5MB, 3 backups)
+- Console + arquivo simultâneos
+- Níveis DEBUG no arquivo, configurável no console
+
+#### 5. Relatório Unificado em Markdown
+- Todas as análises consolidadas em um único arquivo
+- Data/hora de geração
+- Títulos, seções, palavras-chave detectadas
+- Estatísticas consolidadas (diversidade lexical, taxa de cobertura)
+- Formatação profissional com emojis e tabelas
+
+#### 6. Organização de Pastas Planejada
+- `outputs/` para todos os arquivos gerados
+- `outputs/images/` para imagens por PDF
+- `logs/` para logs com rotação
+- `tests/` para testes unitários
+- `.gitignore` atualizado para nova estrutura
+
+#### 7. Tipagem Completa com typing
+- Type hints em todas as funções e métodos
+- Tipos complexos: `Dict[str, Any]`, `List[Tuple[str, int]]`, `Optional[str]`
+- Context managers com types: `__enter__() -> 'ClassName'`
+- Imports organizados de `typing`
+
+#### 8. Testes Simples
+- 28 testes unitários cobrindo módulos principais
+- `unittest` para testes de `text.py`, `files.py`, `extractor.py`
+- Mocks para dependências externas (PyMuPDF)
+- Testes de edge cases (arquivos vazios, colisões, etc.)
+
+#### 9. Cuidado com UX em CLI
+- Mensagens claras e formatadas com separadores
+- Emojis para melhor legibilidade visual
+- Progress feedback durante operações longas
+- Validação de argumentos com mensagens específicas
+- Help detalhado com exemplos práticos de uso
   
 - **Códigos auxiliares bem feitos**:
   - Funções utilitárias reutilizáveis (`text.py`, `files.py`)

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Optional, Any, Tuple
 import fitz
 
 from ..utils.files import ensure_directory, get_unique_filename
@@ -26,7 +26,7 @@ class ImageExtractor:
             logger.error(f"Erro ao abrir PDF: {error}")
             raise
     
-    def extract_images(self, output_dir: str = None) -> List[str]:
+    def extract_images(self, output_dir: Optional[str] = None) -> List[str]:
         if output_dir is None:
             pdf_name = self.pdf_path.stem
             output_dir = f"imagens/{pdf_name}"
@@ -89,13 +89,13 @@ class ImageExtractor:
             total += len(page.get_images())
         return total
     
-    def close(self):
+    def close(self) -> None:
         if self.doc:
             self.doc.close()
             logger.info("PDF fechado (extração de imagens)")
     
-    def __enter__(self):
+    def __enter__(self) -> 'ImageExtractor':
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         self.close()
