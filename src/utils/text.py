@@ -53,31 +53,70 @@ def remove_accents(text: str) -> str:
     return ''.join([char for char in nfkd_form if not unicodedata.combining(char)])
 
 
-def tokenize(text: str, advanced_clean: bool = True) -> List[str]:
-    """Tokeniza texto em palavras individuais.
+def tokenize(text: str, keep_numbers: bool = False, advanced_clean: bool = True) -> List[str]:
+    """Tokeniza texto em palavras individuais com contagem precisa.
     
     Args:
         text: Texto a ser tokenizado
-        advanced_clean: Se True, usa limpeza avançada
+        keep_numbers: Se True, mantém dígitos como palavras válidas
+        advanced_clean: Se True, aplica normalização Unicode e remove hífens de quebra
     
     Returns:
         Lista de tokens em minúsculas
     """
-    cleaned = clean_text(text, advanced=advanced_clean)
-    return [word.lower() for word in cleaned.split() if word]
+    if advanced_clean:
+        text = normalize_unicode(text)
+        text = remove_line_breaks_hyphens(text)
+    
+    if keep_numbers:
+        pattern = r'[^0-9A-Za-zÀ-ÖØ-öø-ÿ]+'
+    else:
+        pattern = r'[^A-Za-zÀ-ÖØ-öø-ÿ]+'
+    
+    text = re.sub(pattern, ' ', text)
+    return [word.lower() for word in text.split() if word]
 
 
-def count_words(text: str) -> int:
-    return len(tokenize(text))
+def count_words(text: str, keep_numbers: bool = False) -> int:
+    """Conta palavras no texto.
+    
+    Args:
+        text: Texto a contar
+        keep_numbers: Se True, números são contados como palavras
+    
+    Returns:
+        Número total de palavras
+    """
+    return len(tokenize(text, keep_numbers=keep_numbers))
 
 
-def get_vocabulary_size(text: str) -> int:
-    tokens = tokenize(text)
+def get_vocabulary_size(text: str, keep_numbers: bool = False) -> int:
+    """Calcula tamanho do vocabulário (palavras únicas).
+    
+    Args:
+        text: Texto a analisar
+        keep_numbers: Se True, números são incluídos no vocabulário
+    
+    Returns:
+        Número de palavras distintas
+    """
+    tokens = tokenize(text, keep_numbers=keep_numbers)
     return len(set(tokens))
 
 
-def get_most_common_words(text: str, n: int = 10, remove_stopwords: bool = True) -> List[Tuple[str, int]]:
-    tokens = tokenize(text)
+def get_most_common_words(text: str, n: int = 10, remove_stopwords: bool = True, keep_numbers: bool = False) -> List[Tuple[str, int]]:
+    """Retorna as N palavras mais comuns do texto.
+    
+    Args:
+        text: Texto a analisar
+        n: Número de palavras mais comuns a retornar
+        remove_stopwords: Se True, remove palavras comuns do português
+        keep_numbers: Se True, inclui números na contagem
+    
+    Returns:
+        Lista de tuplas (palavra, frequência) ordenada por frequência
+    """
+    tokens = tokenize(text, keep_numbers=keep_numbers)
     
     if remove_stopwords:
         stop_words = get_portuguese_stopwords()

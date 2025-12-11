@@ -26,7 +26,16 @@ class ImageExtractor:
             logger.error(f"Erro ao abrir PDF: {error}")
             raise
     
-    def extract_images(self, output_dir: Optional[str] = None) -> List[str]:
+    def extract_images(self, output_dir: Optional[str] = None, min_size: int = 100) -> List[str]:
+        """Extrai imagens do PDF com filtros de qualidade.
+        
+        Args:
+            output_dir: Diretório de saída (None para padrão imagens/<pdf_name>)
+            min_size: Tamanho mínimo em pixels (largura ou altura) para extrair imagem
+        
+        Returns:
+            Lista de caminhos das imagens extraídas
+        """
         if output_dir is None:
             pdf_name = self.pdf_path.stem
             output_dir = f"imagens/{pdf_name}"
@@ -34,9 +43,10 @@ class ImageExtractor:
         output_path = ensure_directory(output_dir)
         extracted_images = []
         
-        logger.info(f"Extraindo imagens para: {output_path}")
+        logger.info(f"Extraindo imagens para: {output_path} (min_size: {min_size}px)")
         
         image_counter = 0
+        skipped_small = 0
         total_pages = len(self.doc)
         
         for page_num in range(total_pages):
@@ -53,6 +63,13 @@ class ImageExtractor:
                         base_image = self.doc.extract_image(xref)
                         image_bytes = base_image["image"]
                         image_ext = base_image["ext"]
+                        image_width = base_image.get("width", 0)
+                        image_height = base_image.get("height", 0)
+                        
+                        if image_width < min_size and image_height < min_size:
+                            skipped_small += 1
+                            logger.debug(f"Imagem muito pequena ignorada: {image_width}x{image_height}px")
+                            continue
                         
                         base_name = f"page{page_num + 1}_img{img_index + 1}"
                         filename = get_unique_filename(output_path, base_name, image_ext)
@@ -63,7 +80,7 @@ class ImageExtractor:
                         
                         extracted_images.append(str(image_path))
                         image_counter += 1
-                        logger.debug(f"Imagem extraída: {filename}")
+                        logger.debug(f"Imagem extraída: {filename} ({image_width}x{image_height}px, {image_ext})")
                         
                     except MemoryError:
                         logger.error(f"Memória insuficiente ao extrair imagem {img_index + 1} da página {page_num + 1}")
@@ -79,7 +96,7 @@ class ImageExtractor:
                 logger.warning(f"Erro ao processar página {page_num + 1} para imagens: {error}")
                 continue
         
-        logger.info(f"Total de imagens extraídas: {image_counter}")
+        logger.info(f"Total de imagens extraídas: {image_counter} (ignoradas {skipped_small} muito pequenas)")
         return extracted_images
     
     def count_images(self) -> int:
