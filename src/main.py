@@ -2,7 +2,7 @@ import sys
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from .cli.arguments import create_parser, validate_args
 from .pdf.extractor import PDFExtractor
@@ -85,10 +85,25 @@ def print_analysis_results(pdf_analysis: Dict[str, Any]) -> None:
     for position, (word, frequency) in enumerate(pdf_analysis['most_common_words'], start=1):
         print(f"   {position:2}. {word:<20} ({frequency:,} ocorrências)")
     
+    if 'titles' in pdf_analysis and pdf_analysis['titles']:
+        print(f"\n📑 Títulos detectados ({len(pdf_analysis['titles'])}):")
+        for title in pdf_analysis['titles'][:5]:
+            print(f"   - {title}")
+    
+    if 'sections' in pdf_analysis and pdf_analysis['sections']:
+        print(f"\n📋 Seções detectadas ({len(pdf_analysis['sections'])}):")
+        for section in pdf_analysis['sections'][:5]:
+            print(f"   {section['number']} {section['title']}")
+    
+    if 'keywords' in pdf_analysis and pdf_analysis['keywords']:
+        print(f"\n🔑 Palavras-chave principais:")
+        keywords_list = [word for word, _ in pdf_analysis['keywords'][:10]]
+        print(f"   {', '.join(keywords_list)}")
+    
     print()
 
 
-def print_image_results(extracted_images: list, output_directory: str) -> None:
+def print_image_results(extracted_images: List[str], output_directory: str) -> None:
     """
     Exibe os resultados da extração de imagens.
     
@@ -135,7 +150,7 @@ def print_summary(summary_text: str) -> None:
 
 def generate_markdown_report(
     pdf_analysis: Dict[str, Any],
-    extracted_images: list,
+    extracted_images: List[str],
     summary_text: Optional[str],
     report_output_path: str
 ) -> None:
@@ -151,8 +166,12 @@ def generate_markdown_report(
     logger = logging.getLogger(__name__)
     logger.info(f"Gerando relatório Markdown: {report_output_path}")
     
+    from datetime import datetime
+    
     with open(report_output_path, 'w', encoding='utf-8') as report_file:
-        report_file.write("# Relatório de Análise de PDF\n\n")
+        report_file.write("# 📊 Relatório Completo de Análise de PDF\n\n")
+        report_file.write(f"**Gerado em**: {datetime.now().strftime('%d/%m/%Y às %H:%M:%S')}\n\n")
+        report_file.write("---\n\n")
         
         report_file.write("## 📄 Informações do Documento\n\n")
         report_file.write(f"- **Arquivo**: `{pdf_analysis['file_name']}`\n")
@@ -169,6 +188,23 @@ def generate_markdown_report(
             report_file.write(f"| {position} | {word} | {frequency:,} |\n")
         report_file.write("\n")
         
+        if 'titles' in pdf_analysis and pdf_analysis['titles']:
+            report_file.write("## 📑 Títulos Detectados\n\n")
+            for title in pdf_analysis['titles']:
+                report_file.write(f"- {title}\n")
+            report_file.write("\n")
+        
+        if 'sections' in pdf_analysis and pdf_analysis['sections']:
+            report_file.write("## 📋 Seções Identificadas\n\n")
+            for section in pdf_analysis['sections']:
+                report_file.write(f"- **{section['number']}** {section['title']}\n")
+            report_file.write("\n")
+        
+        if 'keywords' in pdf_analysis and pdf_analysis['keywords']:
+            report_file.write("## 🔑 Palavras-Chave Principais\n\n")
+            keywords_text = ', '.join([word for word, _ in pdf_analysis['keywords']])
+            report_file.write(f"{keywords_text}\n\n")
+        
         report_file.write("## 🖼️ Imagens Extraídas\n\n")
         report_file.write(f"**Total**: {len(extracted_images)} imagens\n\n")
         if extracted_images:
@@ -178,11 +214,28 @@ def generate_markdown_report(
             report_file.write("\n")
         
         if summary_text:
-            report_file.write("## 📝 Resumo do Documento\n\n")
-            report_file.write(f"{summary_text}\n\n")
+            report_file.write("## 📝 Resumo Gerado por LLM\n\n")
+            report_file.write(f"> {summary_text}\n\n")
+        else:
+            report_file.write("## 📝 Resumo Gerado por LLM\n\n")
+            report_file.write("*Resumo não gerado (use --summarize para ativar)*\n\n")
         
-        report_file.write("---\n")
-        report_file.write("*Relatório gerado pela ferramenta CLI de Análise de PDF*\n")
+        report_file.write("---\n\n")
+        report_file.write("## 📈 Estatísticas Consolidadas\n\n")
+        report_file.write(f"- Total de páginas analisadas: **{pdf_analysis['page_count']}**\n")
+        report_file.write(f"- Palavras únicas no vocabulário: **{pdf_analysis['vocabulary_size']:,}**\n")
+        report_file.write(f"- Taxa de diversidade lexical: **{(pdf_analysis['vocabulary_size'] / max(pdf_analysis['word_count'], 1) * 100):.2f}%**\n")
+        
+        if 'titles' in pdf_analysis:
+            report_file.write(f"- Títulos identificados: **{len(pdf_analysis['titles'])}**\n")
+        if 'sections' in pdf_analysis:
+            report_file.write(f"- Seções estruturadas: **{len(pdf_analysis['sections'])}**\n")
+        
+        report_file.write(f"- Imagens extraídas: **{len(extracted_images)}**\n")
+        report_file.write(f"- Resumo LLM: **{'✓ Gerado' if summary_text else '✗ Não gerado'}**\n\n")
+        
+        report_file.write("---\n\n")
+        report_file.write("*Relatório gerado automaticamente pela ferramenta CLI de Análise de PDF com Sumarização por LLM*\n")
     
     logger.info(f"Relatório salvo em: {report_output_path}")
 
@@ -208,7 +261,8 @@ def main() -> int:
         if not args.no_images:
             logger.info("Iniciando extração de imagens...")
             with ImageExtractor(args.pdf_file) as img_extractor:
-                output_dir = args.output_dir or f"imagens/{Path(args.pdf_file).stem}"
+                pdf_name = Path(args.pdf_file).stem
+                output_dir = args.output_dir or f"outputs/images/{pdf_name}"
                 image_paths = img_extractor.extract_images(output_dir)
             
             print_image_results(image_paths, output_dir)
@@ -227,9 +281,13 @@ def main() -> int:
             
             print_summary(summary)
         
-        if args.report:
-            generate_markdown_report(analysis, image_paths, summary, args.report)
-            print(f"📋 Relatório Markdown salvo em: {args.report}\n")
+        report_path = args.report
+        if not report_path:
+            pdf_name = Path(args.pdf_file).stem
+            report_path = f"outputs/relatorio_{pdf_name}.md"
+        
+        generate_markdown_report(analysis, image_paths, summary, report_path)
+        print(f"📋 Relatório completo salvo em: {report_path}\n")
         
         print("="*70)
         print("✅ Processamento concluído com sucesso!")
