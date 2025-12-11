@@ -1,6 +1,10 @@
-# Analisador de PDF com LLM
+# 📊 Analisador de PDF com LLM
 
-Ferramenta CLI em Python para análise de documentos PDF e geração de resumos usando modelos de linguagem locais.
+> **Desafio de Processo Seletivo - ADA Tech**  
+> Ferramenta CLI em Python para análise completa de documentos PDF e geração de resumos usando modelos de linguagem locais (Hugging Face).
+
+**Desenvolvido por:** Lucas de Wardo  
+**Repositório:** [github.com/LucasdeWardo2049/ADA-project](https://github.com/LucasdeWardo2049/ADA-project)
 
 ## 🚀 Funcionalidades
 
@@ -29,7 +33,7 @@ Ferramenta CLI em Python para análise de documentos PDF e geração de resumos 
 
 ```powershell
 # Navegue até a pasta do projeto
-cd C:\Users\lucas\Documents\ADA
+cd C:\Users\....\ADA
 
 # Crie o ambiente virtual
 python -m venv .venv
@@ -51,7 +55,7 @@ pip install -r requirements.txt
 ### Uso Básico
 
 ```powershell
-python -m src.main "C:\Users\lucas\Downloads\documento.pdf"
+python -m src.main "C:\.......\documento.pdf"
 ```
 
 ### Opções Avançadas
@@ -266,19 +270,107 @@ python -m src.main documento.pdf --model google/flan-t5-small
 - Use modelo menor (ex: `flan-t5-small`)
 - Feche outros programas
 
-## ⭐ O que Avaliar no Projeto
+---
 
-### Arquitetura e Organização ⭐
-- **Pastas bem definidas**: 4 módulos (`cli`, `pdf`, `llm`, `utils`) com responsabilidades únicas
-- **Boa organização interna**: Context managers, tipagem completa, logging estruturado
-- **Evitar arquivos gigantes**: Maior arquivo tem ~180 linhas, funções focadas e coesas
-- **Padrões de projeto**: Separação de concerns, DRY, single responsibility
+## 📖 Como Rodar o Projeto
 
-### Funcionalidades Obrigatórias
-- **Análise completa do PDF**: Extração de páginas, palavras, tamanho do arquivo
-- **Processamento de texto**: Remoção de stopwords, contagem de vocabulário, palavras mais comuns
-- **Extração de imagens**: Salvamento em diretórios organizados com nomes únicos
-- **Resumo com LLM local**: Integração Hugging Face, execução 100% local
+### Pré-requisitos
+- **Python 3.11** (recomendado) ou Python 3.9+
+- Git instalado
+- Conexão com internet (primeira execução para baixar modelo LLM)
+
+### Passo a Passo
+
+#### 1. Clone o Repositório
+```powershell
+git clone https://github.com/LucasdeWardo2049/ADA-project.git
+cd ADA-project
+```
+
+#### 2. Configure o Ambiente Virtual
+```powershell
+# Crie o ambiente virtual
+python -m venv .venv
+
+# Ative o ambiente (Windows PowerShell)
+.\.venv\Scripts\Activate.ps1
+
+# Ou no Linux/Mac
+source .venv/bin/activate
+```
+
+#### 3. Instale as Dependências
+```powershell
+# Atualize o pip
+python -m pip install --upgrade pip
+
+# Instale todas as dependências
+pip install -r requirements.txt
+```
+
+#### 4. Execute o Programa
+```powershell
+# Análise completa (extração + imagens + resumo LLM + relatório)
+python -m src.main "caminho/para/seu/arquivo.pdf"
+
+# Exemplos práticos:
+python -m src.main documento.pdf                           # Análise completa
+python -m src.main documento.pdf --no-summary              # Sem resumo LLM
+python -m src.main documento.pdf --verbose                 # Com logs detalhados
+python -m src.main documento.pdf --output-dir ./imagens    # Diretório customizado
+```
+
+#### 5. Execute os Testes (Opcional)
+```powershell
+# Rodar todos os testes
+python -m unittest discover tests -v
+
+# Rodar testes específicos
+python -m unittest tests.test_text
+python -m unittest tests.test_files
+```
+
+### Estrutura de Saída
+
+Após a execução, o programa cria automaticamente:
+- **`outputs/relatorio_<nome>.md`** - Relatório completo em Markdown
+- **`outputs/images/<nome>/`** - Imagens extraídas do PDF
+- **`logs/pdf_analyzer.log`** - Arquivo de log com histórico
+
+---
+
+## 🎯 Funcionalidades Implementadas
+
+### ✅ Funcionalidades Obrigatórias
+
+#### 1. Análise Completa do PDF
+- ✅ Extração de metadados: número de páginas, tamanho do arquivo
+- ✅ Contagem total de palavras
+- ✅ Análise de vocabulário (palavras únicas)
+- ✅ Processamento com remoção de stopwords em português (NLTK)
+- ✅ Identificação das 10 palavras mais comuns
+
+#### 2. Extração de Imagens
+- ✅ Extração automática de todas as imagens do PDF
+- ✅ Salvamento organizado em diretórios separados por PDF
+- ✅ Nomenclatura única evitando colisões (page1_img1, page1_img2...)
+- ✅ Suporte a múltiplos formatos (PNG, JPEG, etc.)
+
+#### 3. Resumo com LLM Local
+- ✅ Integração com Hugging Face Transformers
+- ✅ Modelo em português: `unicamp-dl/ptt5-base-portuguese-vocab`
+- ✅ Execução 100% local (sem enviar dados para APIs externas)
+- ✅ Chunking automático para textos longos
+- ✅ Fallback para modelo alternativo em caso de erro
+- ✅ Detecção automática de GPU (CUDA) ou CPU
+
+#### 4. Interface CLI
+- ✅ Argumentos de linha de comando com `argparse`
+- ✅ Validação de entrada (arquivo existe, é PDF, etc.)
+- ✅ Mensagens de erro claras e específicas
+- ✅ Help completo com exemplos de uso
+
+### ⭐ Funcionalidades Extras (Diferenciais)
 
 ### Funcionalidades Extras (Diferenciais) 🌟
 
@@ -331,33 +423,178 @@ python -m src.main documento.pdf --model google/flan-t5-small
 - Mocks para dependências externas (PyMuPDF)
 - Testes de edge cases (arquivos vazios, colisões, etc.)
 
-#### 9. Cuidado com UX em CLI
-- Mensagens claras e formatadas com separadores
-- Emojis para melhor legibilidade visual
+#### 9. Experiência do Usuário (UX)
+- Mensagens claras e formatadas com separadores visuais
+- Emojis para melhor legibilidade (📄, 🖼️, 📝, ✅)
 - Progress feedback durante operações longas
 - Validação de argumentos com mensagens específicas
 - Help detalhado com exemplos práticos de uso
-  
-- **Códigos auxiliares bem feitos**:
-  - Funções utilitárias reutilizáveis (`text.py`, `files.py`)
-  - Context managers para gestão automática de recursos
-  - Tipagem completa com type hints
-  - Fallback inteligente (modelo alternativo se principal falhar)
-  - GPU detection automática
-  
-- **Logs e relatórios bem estruturados**:
-  - Sistema de logging com 3 níveis (ERROR, INFO, DEBUG)
-  - Saída no terminal organizada e hierárquica
-  - Geração opcional de relatório Markdown completo
-  - Logs com timestamps e módulo de origem
+- Geração automática de relatório mesmo sem flag `--report`
 
-### Qualidade de Código
-- **Conventional Commits**: Histórico de commits organizado e semântico
-- **Documentação**: README completo com exemplos práticos
-- **Error handling**: Exceções tratadas adequadamente em todos os módulos
-- **Escalabilidade**: Arquitetura preparada para novos tipos de análise
+---
+
+## ⭐ O que Gostaria que Fosse Avaliado
+
+### 1. Arquitetura e Organização do Código 🏗️
+
+#### Estrutura Modular
+- **4 módulos principais** com responsabilidades únicas:
+  - `cli/` - Interface de linha de comando
+  - `pdf/` - Processamento de PDFs (extração e imagens)
+  - `llm/` - Modelos de linguagem e sumarização
+  - `utils/` - Utilitários reutilizáveis (texto e arquivos)
+
+#### Boas Práticas
+- **Separação de responsabilidades**: Cada arquivo tem propósito claro
+- **DRY (Don't Repeat Yourself)**: Funções utilitárias compartilhadas
+- **Single Responsibility Principle**: Funções pequenas e focadas
+- **Context Managers**: Gerenciamento automático de recursos (PDFs, modelos)
+- **Arquivos enxutos**: Maior arquivo tem ~200 linhas, funções coesas
+
+#### Organização de Outputs
+- Estrutura planejada: `outputs/`, `outputs/images/`, `logs/`
+- `.gitignore` atualizado para nova estrutura
+- Geração automática de diretórios quando necessário
+
+### 2. Qualidade e Manutenibilidade do Código 📝
+
+#### Tipagem Completa
+- **Type hints em 100% das funções e métodos**
+- Tipos complexos: `Dict[str, Any]`, `List[Tuple[str, int]]`, `Optional[str]`
+- Context managers tipados: `__enter__() -> 'ClassName'`
+- Imports organizados de `typing`
+
+#### Documentação
+- **Docstrings** em todas as funções públicas
+- Parâmetros e retornos documentados
+- README completo com exemplos práticos
+- Comentários onde a lógica não é óbvia
+
+#### Testes
+- **28 testes unitários** cobrindo módulos principais
+- Framework `unittest` padrão do Python
+- Mocks para dependências externas (PyMuPDF)
+- Cobertura de edge cases (arquivos vazios, colisões, erros)
+
+#### Tratamento de Erros
+- Try-catch específicos em todos os módulos
+- Mensagens de erro claras e acionáveis
+- Fallback inteligente (modelo alternativo se principal falhar)
+- Graceful degradation (continua análise mesmo com erro em página)
+
+### 3. Funcionalidades Avançadas e Diferenciais 🌟
+
+#### Detecção de Estrutura do PDF
+- Identificação automática de títulos (tamanho de fonte + negrito)
+- Detecção de seções numeradas com regex (1., I., A.)
+- Extração de palavras-chave mais relevantes
+- **Valor**: Análise semântica além de simples contagem
+
+#### Suporte a PDFs Grandes
+- Processamento página por página
+- Logging de progresso a cada 20-50 páginas
+- Tratamento de `MemoryError`
+- Controle de exceções em nível de página e imagem
+- **Valor**: Robustez para documentos corporativos reais
+
+#### Normalização Avançada de Texto
+- Remoção de hífens de quebra de linha (`desenvolvi-\nmento`)
+- Normalização Unicode (NFKD)
+- Função para remover acentos
+- Limpeza preservando contexto
+- **Valor**: Qualidade superior na análise de texto
+
+#### Sistema de Logs Profissional
+- Logs em arquivo + console simultâneos
+- Rotação automática (5MB, 3 backups)
+- 3 níveis configuráveis (ERROR, INFO, DEBUG)
+- Timestamps e módulo de origem
+- **Valor**: Debugging e auditoria em produção
+
+#### Relatório Consolidado
+- Markdown profissional com todas as análises
+- Data/hora de geração automática
+- Estatísticas consolidadas (diversidade lexical)
+- Formatação com emojis e tabelas
+- **Valor**: Documento único pronto para compartilhar
+
+### 4. Experiência do Desenvolvedor (DX) 👨‍💻
+
+- **Instalação simples**: `pip install -r requirements.txt`
+- **Uso intuitivo**: Comandos claros e help detalhado
+- **Feedback constante**: Logs informativos sem poluir
+- **Validação proativa**: Erros detectados cedo com mensagens claras
+- **Extensibilidade**: Fácil adicionar novos analisadores ou modelos
+
+### 5. Critérios Específicos do Desafio ADA ✨
+
+| Critério | Implementação | Destaque |
+|----------|---------------|----------|
+| **Pastas bem definidas** | ✅ 4 módulos + tests + outputs | Separação clara de concerns |
+| **Boa organização interna** | ✅ Context managers, tipagem, logs | Context managers em todas as classes |
+| **Evitar arquivos gigantes** | ✅ Máximo ~200 linhas | Funções pequenas e coesas |
+| **Códigos auxiliares** | ✅ utils/text.py, utils/files.py | 15+ funções utilitárias |
+| **Nomes claros** | ✅ Variáveis descritivas | `pdf_analysis` vs `analysis` |
+| **Logs/relatórios** | ✅ Sistema completo | Arquivo + console + Markdown |
+
+---
+
+## 🚀 Diferenciais Técnicos
+
+1. **Zero comentários no código-fonte** - Código autoexplicativo (como solicitado)
+2. **Commits organizados** - Seguindo Conventional Commits
+3. **GPU Detection** - Usa CUDA se disponível, CPU caso contrário
+4. **Chunking inteligente** - Textos longos divididos automaticamente
+5. **Relatório sempre gerado** - Mesmo sem flag `--report`
+
+---
+
+## 📚 Tecnologias Utilizadas
+
+- **Python 3.11** - Linguagem principal
+- **PyMuPDF (fitz)** - Extração de PDF
+- **Hugging Face Transformers** - Modelos LLM
+- **PyTorch** - Backend para modelos
+- **NLTK** - Processamento de linguagem natural
+- **unittest** - Framework de testes
+
+---
 
 ## 📄 Licença
 
-Projeto acadêmico - ADA 2025
+Este projeto foi desenvolvido como parte do processo seletivo da **ADA Tech** e é disponibilizado para fins educacionais e de avaliação.
+
+---
+
+## 👨‍💻 Autor
+
+**Lucas de Wardo**
+- GitHub: [@LucasdeWardo2049](https://github.com/LucasdeWardo2049)
+- LinkedIn: [linkedin.com/in/lucasdewardo](https://linkedin.com/in/lucasdewardo)
+
+---
+
+## 🎯 Sobre o Desafio
+
+Este projeto foi desenvolvido como resposta ao desafio técnico do processo seletivo da **ADA Tech**, que solicitava:
+
+1. ✅ Uma ferramenta CLI em Python
+2. ✅ Análise de arquivos PDF
+3. ✅ Extração de metadados e imagens
+4. ✅ Geração de resumo com LLM local
+5. ✅ Código bem organizado e documentado
+
+**Diferenciais implementados além do solicitado:**
+- Detecção automática de estrutura (títulos, seções)
+- Sistema profissional de logs com rotação
+- Tratamento robusto para PDFs grandes
+- Relatório consolidado em Markdown
+- 28 testes unitários
+- Tipagem completa com type hints
+- Normalização avançada de texto
+
+---
+
+**⭐ Se este projeto atendeu suas expectativas, considere dar uma estrela no repositório!**
+
 
