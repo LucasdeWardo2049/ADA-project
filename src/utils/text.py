@@ -16,8 +16,12 @@ def get_portuguese_stopwords() -> Set[str]:
 
 
 def normalize_unicode(text: str) -> str:
-    """Normaliza caracteres Unicode para forma NFKD."""
-    return unicodedata.normalize('NFKD', text)
+    """Normaliza caracteres Unicode para forma NFC.
+    
+    NFC compõe caracteres acentuados em uma única unidade (ex: á = U+00E1),
+    evitando que palavras como 'vocabulário' sejam quebradas em tokens.
+    """
+    return unicodedata.normalize('NFC', text)
 
 
 def remove_line_breaks_hyphens(text: str) -> str:

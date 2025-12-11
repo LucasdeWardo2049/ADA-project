@@ -31,6 +31,20 @@ class TestTextUtils(unittest.TestCase):
         self.assertIn("python", tokens)
         self.assertIn("linguagem", tokens)
     
+    def test_tokenize_accented_words(self):
+        """Testa que palavras acentuadas não são quebradas."""
+        # Testa palavras com acentos comuns em português
+        self.assertEqual(tokenize("vocabulário"), ["vocabulário"])
+        self.assertEqual(tokenize("obrigatório"), ["obrigatório"])
+        self.assertEqual(tokenize("função"), ["função"])
+        self.assertEqual(tokenize("análise"), ["análise"])
+        
+        # Testa que "rio" não aparece sozinho quando parte de palavra acentuada
+        tokens = tokenize("O vocabulário obrigatório")
+        self.assertNotIn("rio", tokens)
+        self.assertIn("vocabulário", tokens)
+        self.assertIn("obrigatório", tokens)
+    
     def test_count_words(self):
         text = "um dois três quatro cinco"
         count = count_words(text)
