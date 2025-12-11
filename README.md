@@ -541,7 +541,7 @@ Após a execução, o programa cria automaticamente:
 
 ## 🚀 Diferenciais Técnicos
 
-1. **Zero comentários no código-fonte** - Código autoexplicativo (como solicitado)
+1. **Codigo intuitivo** - Código autoexplicativo 
 2. **Commits organizados** - Seguindo Conventional Commits
 3. **GPU Detection** - Usa CUDA se disponível, CPU caso contrário
 4. **Chunking inteligente** - Textos longos divididos automaticamente
